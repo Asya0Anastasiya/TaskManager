@@ -40,6 +40,7 @@
             contextMenuStrip1 = new ContextMenuStrip(components);
             stopToolStripMenuItem = new ToolStripMenuItem();
             treeView1 = new TreeView();
+            owner = new ColumnHeader();
             contextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -48,20 +49,20 @@
             toolStrip1.ImageScalingSize = new Size(20, 20);
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(1066, 25);
+            toolStrip1.Size = new Size(1416, 25);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
             // listView1
             // 
-            listView1.Columns.AddRange(new ColumnHeader[] { proccess, memory, id, priorityClass, basePriority, threadsCount });
+            listView1.Columns.AddRange(new ColumnHeader[] { proccess, memory, id, priorityClass, basePriority, threadsCount, owner });
             listView1.ContextMenuStrip = contextMenuStrip1;
             listView1.Font = new Font("Palatino Linotype", 9F, FontStyle.Regular, GraphicsUnit.Point);
             listView1.GridLines = true;
             listView1.Location = new Point(0, 25);
             listView1.MultiSelect = false;
             listView1.Name = "listView1";
-            listView1.Size = new Size(689, 425);
+            listView1.Size = new Size(1063, 464);
             listView1.TabIndex = 3;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -85,6 +86,7 @@
             // priorityClass
             // 
             priorityClass.Text = "PriorityClass";
+            priorityClass.Width = 200;
             // 
             // basePriority
             // 
@@ -109,17 +111,22 @@
             // 
             // treeView1
             // 
-            treeView1.Location = new Point(728, 28);
+            treeView1.Location = new Point(1097, 25);
             treeView1.Name = "treeView1";
-            treeView1.Size = new Size(307, 410);
+            treeView1.Size = new Size(307, 464);
             treeView1.TabIndex = 4;
             treeView1.AfterSelect += treeView1_AfterSelect;
+            // 
+            // owner
+            // 
+            owner.Text = "Owner";
+            owner.Width = 200;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1066, 450);
+            ClientSize = new Size(1416, 501);
             Controls.Add(treeView1);
             Controls.Add(listView1);
             Controls.Add(toolStrip1);
@@ -143,5 +150,6 @@
         private ColumnHeader basePriority;
         private ColumnHeader threadsCount;
         private TreeView treeView1;
+        private ColumnHeader owner;
     }
 }

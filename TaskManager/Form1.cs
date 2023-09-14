@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Management;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using Microsoft.VisualBasic;
 
 namespace TaskManager
@@ -27,7 +29,7 @@ namespace TaskManager
             {
                 try
                 {
-                    string[] row = new string[] { processList[i].ProcessName.ToString(), processList[i].WorkingSet64.ToString(), processList[i].Id.ToString(), processList[i].PriorityClass.ToString(), processList[i].BasePriority.ToString(), processList[i].Threads.Count.ToString() };
+                    string[] row = new string[] { processList[i].ProcessName.ToString(), processList[i].WorkingSet64.ToString(), processList[i].Id.ToString(), processList[i].PriorityClass.ToString(), processList[i].BasePriority.ToString(), processList[i].Threads.Count.ToString(), GetUsername(processList[i].SessionId) };
                     listView1.Items.Add(new ListViewItem(row));
                     treeView1.Nodes.Add(processList[i].ProcessName.ToString());
                     for (int j = 0; j < processList[i].Threads.Count; j++)
@@ -37,7 +39,7 @@ namespace TaskManager
                 }
                 catch (Exception)
                 {
-                    string[] row = new string[] { processList[i].ProcessName.ToString(), processList[i].WorkingSet64.ToString(), processList[i].Id.ToString(), "Access denied", processList[i].BasePriority.ToString(), processList[i].Threads.Count.ToString() };
+                    string[] row = new string[] { processList[i].ProcessName.ToString(), processList[i].WorkingSet64.ToString(), processList[i].Id.ToString(), "Access denied", processList[i].BasePriority.ToString(), processList[i].Threads.Count.ToString(), GetUsername(processList[i].SessionId) };
                     listView1.Items.Add(new ListViewItem(row));
                     treeView1.Nodes.Add(processList[i].ProcessName.ToString());
                     for (int j = 0; j < processList[i].Threads.Count; j++)
@@ -73,6 +75,38 @@ namespace TaskManager
         private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
 
+        }
+
+        [DllImport("Wtsapi32.dll")]
+        private static extern bool WTSQuerySessionInformation(IntPtr hServer, int sessionId, WtsInfoClass wtsInfoClass, out IntPtr ppBuffer, out int pBytesReturned);
+        [DllImport("Wtsapi32.dll")]
+        private static extern void WTSFreeMemory(IntPtr pointer);
+
+        private enum WtsInfoClass
+        {
+            WTSUserName = 5,
+            WTSDomainName = 7,
+        }
+
+        private static string GetUsername(int sessionId, bool prependDomain = true)
+        {
+            IntPtr buffer;
+            int strLen;
+            string username = "SYSTEM";
+            if (WTSQuerySessionInformation(IntPtr.Zero, sessionId, WtsInfoClass.WTSUserName, out buffer, out strLen) && strLen > 1)
+            {
+                username = Marshal.PtrToStringAnsi(buffer);
+                WTSFreeMemory(buffer);
+                if (prependDomain)
+                {
+                    if (WTSQuerySessionInformation(IntPtr.Zero, sessionId, WtsInfoClass.WTSDomainName, out buffer, out strLen) && strLen > 1)
+                    {
+                        username = Marshal.PtrToStringAnsi(buffer) + "\\" + username;
+                        WTSFreeMemory(buffer);
+                    }
+                }
+            }
+            return username;
         }
     }
 }
